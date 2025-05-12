@@ -5,7 +5,7 @@
 #define VALOR_AGUA 0
 #define VALOR_NAVIO 3
 
-// Função para imprimir o tabuleiro
+// Função para exibir o tabuleiro
 void exibirTabuleiro(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO])
 {
     printf("Tabuleiro:\n");
@@ -19,12 +19,84 @@ void exibirTabuleiro(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO])
     }
 }
 
+// Função auxiliar para verificar se uma posição está ocupada
+int estaOcupado(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO], int linha, int coluna)
+{
+    return tabuleiro[linha][coluna] == VALOR_NAVIO;
+}
+
+// Função para posicionar navio horizontal
+int posicionarHorizontal(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO], int linha, int coluna)
+{
+    if (coluna + TAM_NAVIO > TAM_TABULEIRO)
+        return 0;
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        if (estaOcupado(tabuleiro, linha, coluna + i))
+            return 0;
+    }
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        tabuleiro[linha][coluna + i] = VALOR_NAVIO;
+    }
+    return 1;
+}
+
+// Função para posicionar navio vertical
+int posicionarVertical(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO], int linha, int coluna)
+{
+    if (linha + TAM_NAVIO > TAM_TABULEIRO)
+        return 0;
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        if (estaOcupado(tabuleiro, linha + i, coluna))
+            return 0;
+    }
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        tabuleiro[linha + i][coluna] = VALOR_NAVIO;
+    }
+    return 1;
+}
+
+// Função para posicionar navio na diagonal principal (↘)
+int posicionarDiagonalPrincipal(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO], int linha, int coluna)
+{
+    if (linha + TAM_NAVIO > TAM_TABULEIRO || coluna + TAM_NAVIO > TAM_TABULEIRO)
+        return 0;
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        if (estaOcupado(tabuleiro, linha + i, coluna + i))
+            return 0;
+    }
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        tabuleiro[linha + i][coluna + i] = VALOR_NAVIO;
+    }
+    return 1;
+}
+
+// Função para posicionar navio na diagonal secundária (↙)
+int posicionarDiagonalSecundaria(int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO], int linha, int coluna)
+{
+    if (linha + TAM_NAVIO > TAM_TABULEIRO || coluna - TAM_NAVIO + 1 < 0)
+        return 0;
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        if (estaOcupado(tabuleiro, linha + i, coluna - i))
+            return 0;
+    }
+    for (int i = 0; i < TAM_NAVIO; i++)
+    {
+        tabuleiro[linha + i][coluna - i] = VALOR_NAVIO;
+    }
+    return 1;
+}
+
 int main()
 {
-    // Matriz representando o tabuleiro
+    // Inicializa tabuleiro com água
     int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO];
-
-    // Inicializa o tabuleiro com água (0)
     for (int i = 0; i < TAM_TABULEIRO; i++)
     {
         for (int j = 0; j < TAM_TABULEIRO; j++)
@@ -33,62 +105,32 @@ int main()
         }
     }
 
-    // Define as posições iniciais dos navios
-    int linhaNavioHorizontal = 2;
-    int colunaNavioHorizontal = 4;
-
-    int linhaNavioVertical = 5;
-    int colunaNavioVertical = 1;
-
-    // Verifica se o navio horizontal cabe no tabuleiro
-    if (colunaNavioHorizontal + TAM_NAVIO <= TAM_TABULEIRO)
+    // Posiciona navios
+    // 1. Horizontal (linha 1, coluna 2)
+    if (!posicionarHorizontal(tabuleiro, 1, 2))
     {
-        // Verifica se as posições já estão ocupadas
-        int podeColocar = 1;
-        for (int i = 0; i < TAM_NAVIO; i++)
-        {
-            if (tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] == VALOR_NAVIO)
-            {
-                podeColocar = 0;
-                break;
-            }
-        }
-
-        // Se puder, posiciona o navio horizontal
-        if (podeColocar)
-        {
-            for (int i = 0; i < TAM_NAVIO; i++)
-            {
-                tabuleiro[linhaNavioHorizontal][colunaNavioHorizontal + i] = VALOR_NAVIO;
-            }
-        }
+        printf("Falha ao posicionar navio horizontal.\n");
     }
 
-    // Verifica se o navio vertical cabe no tabuleiro
-    if (linhaNavioVertical + TAM_NAVIO <= TAM_TABULEIRO)
+    // 2. Vertical (linha 4, coluna 6)
+    if (!posicionarVertical(tabuleiro, 4, 6))
     {
-        // Verifica se as posições já estão ocupadas
-        int podeColocar = 1;
-        for (int i = 0; i < TAM_NAVIO; i++)
-        {
-            if (tabuleiro[linhaNavioVertical + i][colunaNavioVertical] == VALOR_NAVIO)
-            {
-                podeColocar = 0;
-                break;
-            }
-        }
-
-        // Se puder, posiciona o navio vertical
-        if (podeColocar)
-        {
-            for (int i = 0; i < TAM_NAVIO; i++)
-            {
-                tabuleiro[linhaNavioVertical + i][colunaNavioVertical] = VALOR_NAVIO;
-            }
-        }
+        printf("Falha ao posicionar navio vertical.\n");
     }
 
-    // Exibe o tabuleiro final com os navios posicionados
+    // 3. Diagonal principal ↘ (linha 0, coluna 0)
+    if (!posicionarDiagonalPrincipal(tabuleiro, 0, 0))
+    {
+        printf("Falha ao posicionar navio diagonal principal.\n");
+    }
+
+    // 4. Diagonal secundária ↙ (linha 2, coluna 9)
+    if (!posicionarDiagonalSecundaria(tabuleiro, 2, 9))
+    {
+        printf("Falha ao posicionar navio diagonal secundária.\n");
+    }
+
+    // Exibe o tabuleiro final
     exibirTabuleiro(tabuleiro);
 
     return 0;
